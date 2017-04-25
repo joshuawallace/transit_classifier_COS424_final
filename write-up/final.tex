@@ -1,0 +1,67 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{cos424,times}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amssymb}
+
+\def\Na{Na\"ive}
+
+\title{Creating an Automated Classifier to Approximate the By-eye
+  Selection of HAT Exoplanet Candidates}
+
+
+\author{
+Will Coulton \\
+Department of Physics \\
+Princeton University\\
+\texttt{wcoulton@princeton.edu} \\
+\And
+Joshua Wallace\\
+Department of Astrophysical Sciences\\
+Princeton University\\
+\texttt{joshuajw@princeton.edu} \\
+}
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+\input{abstract.tex}
+\end{abstract}
+
+\section{Introduction}
+\input{intro.tex}
+
+
+\section{Related Work}
+\input{related.tex}
+
+\section{Data}
+\input{data.tex}
+
+\section{Methods}
+\input{methods.tex}
+
+\section{Results}
+\input{results.tex}
+
+
+\section{Discussion and Conclusion}
+\input{discussion.tex}
+
+\subsubsection*{Acknowledgments}
+We are grateful to Joel Hartman for providing a script to extract the
+necessary data from the HAT database.  We are also grateful to the
+entire HAT team (PI: Gaspar Bakos) for their many dedicated years of
+constant observations and the huge pile of astronomical data they've collected.
+
+
+\bibliography{ref}
+\bibliographystyle{plain}
+
+\end{document}
