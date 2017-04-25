@@ -63,3 +63,20 @@ def read_in_data(path="../data/"):
     # Return the data and the classification
     return (data_selected + data_unselected, was_selected)
 
+
+"""
+a, b = read_in_data()
+
+import numpy as np
+
+i = 0
+i2 = 0
+for j in range(len(a)):
+    if any([np.isnan(item) for item in a[j] ]):
+        if j < 1000:
+            i+= 1
+        else:
+            i2+=1
+print i
+print i2
+"""
