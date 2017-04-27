@@ -80,3 +80,32 @@ for j in range(len(a)):
 print i
 print i2
 """
+
+
+def precision_recall_etc(classified_sentiment, actual_sentiment):
+    if len(classified_sentiment) != len(actual_sentiment):  # if lengths don't match
+        raise RuntimeError("Lengths of arguments to accuracy_percentage not the same")
+    tp = fp = tn = fn = 0  # t=true, f=false, p=postive, n=negative
+    for i in range(len(classified_sentiment)):
+        if actual_sentiment[i] == 1:  # actual sentiment is positive
+            if classified_sentiment[i] == actual_sentiment[i]:  # if matches
+                tp += 1
+            else:  # if doesn't match
+                fn += 1
+        else:  # actual sentiment is negative
+            if classified_sentiment[i] == actual_sentiment[i]:  # if matches
+                tn += 1
+            else:  #if doesn't match
+                fp += 1
+
+    # calculate the various performance metrics
+    precision = float(tp)/float(tp + fp)
+    recall = float(tp)/float(tp + fn)
+    specificity = float(tn)/float(fp + tn)
+    NPV = float(tn)/float(tn + fn)
+    f1 = 2.*float(precision*recall)/float(precision + recall)
+
+    return {'precision': precision, 'recall': recall,
+            'specificity': specificity, 'NPV': NPV,
+            'f1': f1, 'tp': tp, 'tn': tn, 'fp': fp, 'fn': fn,
+            'accuracy': float(tp + tn)/float(tp + fp + tn + fn)}
