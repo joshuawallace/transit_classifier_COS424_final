@@ -6,11 +6,18 @@ Of the few hundred hot Jupiters that have been found to date, the plurality (${\
 
 \begin{figure}
 \begin{centering}
-\includegraphics[width=4in]{hs-scopes.png}
+\includegraphics[width=3in]{hs-scopes.png}
 \caption{\label{hsscopes} The four HATSouth telescopes at Siding Springs Observatory, Australia.  Photo credit Gaspar Bakos.  From \cite{hatsouthpicture}.}
 \end{centering}
 \end{figure}
 
-Planets are far too faint compared to their host stars to be able to detect directly.  Instead, what the HAT arrays do is monitor the brightness of stars as a function of time.  When a planet crosses in front the star it orbits, the amount of light detected from that star is decreased.  When a star is found to have periodic dips in brightness, it is labelled as a potentially planet-hosting star.  Various cuts are made to help ensure that the signal is neither spurious nor caused by another astrophysical source other than a planet.  Most of these cuts are automated, but the final step in the HAT pipeline is a manual, by-eye examination of the signal.  Planet candidates that pass this step then are sent for follow up (and hopefully confirmation!) at bigger telescopes.
+The detection technique used by HAT*, {\it Kepler}, and many other exoplanet surveys is the ``transit'' technique.  Planets are far too faint compared to their host stars to be able to detect directly around most stars.  Instead, in the transit technique, the brightness of stars is monitored as a function of time (usually by taking periodic long-exposure photographs of large areas of the sky).  When a planet crosses in front the star it orbits, the amount of light detected from that star is decreased.  This is shown in Figure~\ref{transit}.  Transits are found in data using matched filtering (with either a box- or trapezoid-shaped filter, matching the signal from a transiting exoplanet), folding the data on a variety of periods and phases.  When a star is found to have periodic dips in brightness, it is labeled as a potentially planet-hosting star.  However, transiting planets are not the only source of periodic signals like that seen in Figure~\ref{transit}.  Starspots rotating in and out of view also provide periodic dips in brightness and binary stars that eclipse each other in a grazing way (so the amount of light that goes missing during an eclipse is about the same as a planet) are two examples of astrophysical false positive signals. Various cuts are made to help ensure that a prospective planet is neither one of these false positives nor a spurious signal.  The various parameters of the fit to the transit signal (depth, time of ingress, length of transit) are often good indicators to separate between planet and not.  These cuts are automated.  However, after the cuts, there are still false positives that are not obvious to the pipeline but are obvious to a trained human eye.  Thus, the final step in the HAT pipeline is a manual, by-eye examination of the signal.  Planet candidates that pass this step then are sent for follow up (and hopefully confirmation!) at bigger telescopes.
+
+\begin{figure}
+\begin{centering}
+\includegraphics[height=1.9in]{transit.png}
+\caption{\label{transit} An example ``light curve'' (brightness as a function of time) from a star that hosts a transiting exoplanet.  As the planet crosses in front of the star, the measured brightness from the star is less than the out-of-transit value.  Partial eclipses as the planet is transitioning from being out-of-transit to fully in transit put a slope in the light curve between in-transit and out-of-transit magnitudes.  Public domain image from \cite{transit_pic}.}
+\end{centering}
+\end{figure}
 
 Other than this manual step, the vetting of possible planet candidates is completely automatic.  This single manual step is quite labor intensive, and prevents a fully automatic characterization of planet detection efficiency, which is necessary for the calculation of statistics related to the occurrence rate of these planets.  Thus, it would be nice to have an automated approximation to the by-eye work that has occurred.  This is the purpose of this project.
