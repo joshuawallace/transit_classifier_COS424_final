@@ -10,14 +10,23 @@ import general_functions as gf
 from sklearn.cluster import KMeans
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import Imputer
+import soft_impute
 
 import numpy as np
 
 
 # Some parameters for this run
-number_of_clusters = 5
+number_of_clusters = 7
 num_cross_validation_folds = 10
 imputation_strategey = 'median'
+
+
+def softImpute(data, nCompSoft=30, **kargs):
+        imputeFnc = soft_impute.SoftImpute(J=nCompSoft, lambda_=0.0)
+        fit = imputeFnc.fit(data)
+        imputeFnc.predict(data, copyto=True)
+        return data
+
 
 data, category = gf.read_in_data()
 
@@ -26,10 +35,11 @@ for i in range(len(data)):
     for j in range(len(data[i])):
         if np.isinf(data[i][j]):
             data[i][j] = float('nan')
+data = softImpute(np.array(data))
 
 # Impute
-imputation = Imputer(missing_values='NaN', strategy=imputation_strategey)
-data = imputation.fit_transform(data)
+#imputation = Imputer(missing_values='NaN', strategy=imputation_strategey)
+#data = imputation.fit_transform(data)
 
 
 clustering = KMeans(n_clusters=number_of_clusters, n_jobs=-2, n_init=12, init='random')
