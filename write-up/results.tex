@@ -1,5 +1,14 @@
 \subsection{Unsupervised Learning}
-There were no unsupervised methods that provided obvious structure  that matched the classifications.  
+There were no unsupervised methods that provided obvious structure  that matched the classifications.  For the K-means method, a variety of k-values were used.  In each case, the positive cases were divided among the categories in rough proportion to the total number of cases in each category.  A similar thing happened with LDA.  Since LDA is a mixed membership model, we decided to assign hard membership if an object had larger than a certain threshold (e.g., 0.8 or 0.9) membership in a particular topic.  Members of a particular topic were distributed between positive and negative examples in rough proportion to the actual distributions of the examples in the data set.
+For PCA, the first principal component explains 20\% of the variance, then 11\%, 8.5\%, and 7.8\% for the next three principal components.  Figure~\ref{pca} shows the projection of the data onto the first two principal components.  The green circles are the positive cases and blue dots are the negative cases.  From just the first two principal components, there is no exploitable separation between the positive and negative cases that allows for classification.  Running K-means (with several different values of k) on the PCA decomposed values also revelead no exploitable structure for classification.
+\begin{figure}
+\begin{centering}
+\includegraphics[width=5in]{pca.png}
+\caption{\label{pca} The data projected on the first two principal components.  The positive cases are in green and the negative cases are in blue.  Note that the scales of the axes are the same; they have been stretched and squished to better fit in the single-column format of this paper.  The transparency of the green points is less than the blue points so that they could be better visible, since there are about 30 times more blue points than green points.  There is no separation between the two groups of points.  In the axis labels, ``PC'' = principal component.}
+\end{centering}
+\end{figure}
+
+
 
 
 
