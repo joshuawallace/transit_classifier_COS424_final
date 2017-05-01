@@ -10,6 +10,7 @@ import general_functions as gf
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import Imputer
 from sklearn.preprocessing import scale
+from sklearn.mixture import GaussianMixture
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 from sklearn import svm
@@ -74,6 +75,7 @@ print np.var([i[1] for i in negative])
 print np.var([i[0] for i in positive])
 print np.var([i[1] for i in positive])
 
+print "----"
 
 clustering = KMeans(n_clusters=4, n_jobs=-2, n_init=12, init='random')
 clustering.fit(training_data)
@@ -81,6 +83,10 @@ clustering.fit(training_data)
 test_data = pca.transform(test_data)
 a = clustering.predict(test_data)
 
+scores = gf.precision_recall_etc(a, test_category)
+print scores
+
+"""
 a_positive = a[:150]
 a_negative = a[150:]
 
@@ -89,18 +95,43 @@ print len([i for i in a_positive if i==1])
 print len([i for i in a_positive if i==2])
 print len([i for i in a_positive if i==3])
 #print len([i for i in a_positive if i==4])
-
+print "-"
 print len([i for i in a_negative if i==0])
 print len([i for i in a_negative if i==1])
 print len([i for i in a_negative if i==2])
 print len([i for i in a_negative if i==3])
-#print len([i for i in a_positive if i==4])
+#print len([i for i in a_positive if i==4])"""
 
-"""clf = svm.SVC()
+clf = svm.SVC()
 clf.fit(training_data, training_category)
 
-test_data = pca.transform(test_data)
+#test_data = pca.transform(test_data)
 predictions = clf.predict(test_data)
 
 scores = gf.precision_recall_etc(predictions, test_category)
-print scores"""
+print scores
+
+
+print "----"
+print "--------"
+
+gmm = GaussianMixture(n_components=4, n_init=5, init_params='random')
+gmm.fit(training_data)
+predictions = gmm.predict(training_data)
+predictions_posterior = gmm.predict_proba(training_data)
+
+print predictions
+print predictions_posterior
+
+print len([i[0] for i in predictions_posterior[:874] if i[0] >0.9])
+print len([i[1] for i in predictions_posterior[:874] if i[1] >0.9])
+print len([i[2] for i in predictions_posterior[:874] if i[2] >0.9])
+print len([i[3] for i in predictions_posterior[:874] if i[3] >0.9])
+#print len([i[4] for i in predictions_posterior[:874] if i[4] >0.9])
+print "----"
+print "-----"
+print len([i[0] for i in predictions_posterior[874:] if i[0] >0.9])
+print len([i[1] for i in predictions_posterior[874:] if i[1] >0.9])
+print len([i[2] for i in predictions_posterior[874:] if i[2] >0.9])
+print len([i[3] for i in predictions_posterior[874:] if i[3] >0.9])
+#print len([i[4] for i in predictions_posterior[874:] if i[4] >0.9])
