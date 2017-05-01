@@ -27,7 +27,6 @@ def softImpute(data, nCompSoft=30, **kargs):
 
 # Some parameters for this run
 n_components = 60
-imputation_strategey = 'median'
 
 data, category = gf.read_in_data()
 
@@ -68,6 +67,12 @@ fig.tight_layout()
 fig.savefig("pca.png")
 
 print(pca.explained_variance_ratio_)
+
+print np.var([i[0] for i in negative])
+print np.var([i[1] for i in negative])
+
+print np.var([i[0] for i in positive])
+print np.var([i[1] for i in positive])
 
 
 clustering = KMeans(n_clusters=4, n_jobs=-2, n_init=12, init='random')
