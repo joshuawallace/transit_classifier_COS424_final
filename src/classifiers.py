@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 from sklearn.naive_bayes import GaussianNB
 from  sklearn.linear_model import LogisticRegressionCV
 import soft_impute
@@ -10,6 +11,8 @@ from sklearn.svm import SVC
 from sklearn.model_selection import KFold
 from sklearn.pipeline import Pipeline
 import general_functions
+from sklearn.metrics import precision_score,recall_score
+from sklearn.model_selection import GridSearchCV
 
 from sklearn.ensemble import RandomForestClassifier,ExtraTreesClassifier,GradientBoostingClassifier,AdaBoostClassifier
 
@@ -29,7 +32,7 @@ def PPCA(data,nCompPCA=30,**kargs):
         #print tmp.astype('float').shape
         return data
 
-def LogisticReg(trainData,trainCategory,penalty='l1',feature_sel=0,score_func=mutual_info_classif, kBest=20):
+def LogisticReg(trainData,trainCategory,penalty='l1',feature_sel=1,score_func=mutual_info_classif, kBest=20):
 
 		clasifier=LogisticRegressionCV(penalty=penalty,solver='liblinear')
 		if feature_sel:
@@ -40,75 +43,105 @@ def LogisticReg(trainData,trainCategory,penalty='l1',feature_sel=0,score_func=mu
 		clasifier.fit(trainData,trainCategory)
 		return clasifier
 
-def NaiveBayes(trainData,trainCategory,score_func=mutual_info_classif,kBest=20):
+def NaiveBayes(trainData,trainCategory,score_func=mutual_info_classif,kBest=20,gridSearch=0):
 	feature_sel = SelectKBest(score_func=score_func, k=kBest)
 	pipeline = Pipeline([('select', feature_sel),('classifier', GaussianNB())])
 	pipeline.fit(trainData,trainCategory)
 	return pipeline
 
-def SVM(trainData,trainCategory,C=1.0, kernel='rbf' , degree=3, gamma='auto',feature_sel=0,score_func=mutual_info_classif, kBest=20): #kernel 'rbf','poly'
-	clasifier=SVC(C=C,kernel='rbf',degree=degree,gamma=gamma)
+def SVM(trainData,trainCategory,C=1.0, kernel='rbf' , degree=3, gamma='auto',feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0): #kernel 'rbf','poly'
+	classifier=SVC(C=C,kernel='rbf',degree=degree,gamma=gamma)
+#parameters = {'kernel':('linear', 'rbf'), 'C':[1, 10]}param_grid={"C": [1e0, 1e1, 1e2, 1e3],
+                           #    "gamma": np.logspace(-2, 2, 5)})
+	param_grid=[{'kernel': ['rbf'], 'gamma': np.logspace(-2, 2, 5),
+                     'C': [1, 10, 100, 1000]},{'kernel': ['poly'], 'C': [1, 10, 100, 1000],'degree':[1,3,5]}]
 	if feature_sel:
 		feature_sel = SelectKBest(score_func=score_func, k=kBest)
-		pipeline = Pipeline([('select', feature_sel),('classifier', clasifier)])
-		pipeline.fit(trainData,trainCategory)
-		return pipeline
-	clasifier.fit(trainData,trainCategory)
-	return clasifier
+		pipeline = Pipeline([('select', feature_sel),('classifier', classifier)])
+	else:
+		pipeline=classifier
+	if gridSearch:
+			pipeline = GridSearchCV(pipeline, param_grid=param_grid)
+	pipeline.fit(trainData,trainCategory)
+	return pipeline
 
 
-def RandomForest(trainData,trainCategory, n_estimators=10,feature_sel=0,score_func=mutual_info_classif, kBest=20 ): 
-	clasifier=RandomForestClassifier(n_estimators=n_estimators)
+def RandomForest(trainData,trainCategory, n_estimators=10,feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0 ): 
+	classifier=RandomForestClassifier(n_estimators=n_estimators)
+	parameters={'n_estimators':[5,30]}
 	if feature_sel:
 		feature_sel = SelectKBest(score_func=score_func, k=kBest)
-		pipeline = Pipeline([('select', feature_sel),('classifier', clasifier)])
-		pipeline.fit(trainData,trainCategory)
-		return pipeline
-	clasifier.fit(trainData,trainCategory)
-	return clasifier
+		pipeline = Pipeline([('select', feature_sel),('classifier', classifier)])
+	else:
+		pipeline=classifier
+	if gridSearch:
+			pipeline = GridSearchCV(pipeline, parameters)
+			
+	pipeline.fit(trainData,trainCategory)
+	return pipeline
 
 
-def ExtraTrees(trainData,trainCategory, n_estimators=10,feature_sel=0,score_func=mutual_info_classif, kBest=20 ): 
-	clasifier=ExtraTreesClassifier(n_estimators=n_estimators)
+def ExtraTrees(trainData,trainCategory, n_estimators=10,feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0 ): 
+	classifier=ExtraTreesClassifier(n_estimators=n_estimators)
+	parameters={'n_estimators':[5,30]}
 	if feature_sel:
 		feature_sel = SelectKBest(score_func=score_func, k=kBest)
-		pipeline = Pipeline([('select', feature_sel),('classifier', clasifier)])
-		pipeline.fit(trainData,trainCategory)
-		return pipeline
-	clasifier.fit(trainData,trainCategory)
-	return clasifier
+		pipeline = Pipeline([('select', feature_sel),('classifier', classifier)])
+	else:
+		pipeline=classifier
+	if gridSearch:
+			pipeline = GridSearchCV(pipeline, parameters)
+
+	pipeline.fit(trainData,trainCategory)
+	return pipeline
 
 
-def AdaBoost(trainData,trainCategory, n_estimators=100,feature_sel=0,score_func=mutual_info_classif, kBest=20 ): 
+def AdaBoost(trainData,trainCategory, n_estimators=100,feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0 ): 
 	clasifier=AdaBoostClassifier(n_estimators=n_estimators)
+	parameters={'learning_rate' : [.01,.1,.5],'n_estimators' : [10,100,500],'max_depth':[1,3,5] }
 	if feature_sel:
 		feature_sel = SelectKBest(score_func=score_func, k=kBest)
 		pipeline = Pipeline([('select', feature_sel),('classifier', clasifier)])
-		pipeline.fit(trainData,trainCategory)
-		return pipeline
-	clasifier.fit(trainData,trainCategory)
-	return clasifier
+
+	else:
+		pipeline=classifier
+	if gridSearch:
+			pipeline = GridSearchCV(pipeline, parameters)
+	pipeline.fit(trainData,trainCategory)
+	return pipeline
 
 
-def GradientBoosting(trainData,trainCategory, n_estimators=100,max_depth=3,feature_sel=0,score_func=mutual_info_classif, kBest=20 ): 
+def GradientBoosting(trainData,trainCategory, n_estimators=100,max_depth=3,feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0 ): 
 	clasifier=GradientBoostingClassifier(n_estimators=n_estimators,max_depth=3)
 	if feature_sel:
 		feature_sel = SelectKBest(score_func=score_func, k=kBest)
 		pipeline = Pipeline([('select', feature_sel),('classifier', clasifier)])
-		pipeline.fit(trainData,trainCategory)
-		return pipeline
-	clasifier.fit(trainData,trainCategory)
-	return clasifier
+
+	else:
+		pipeline=classifier
+	if gridSearch:
+			pipeline = GridSearchCV(pipeline, parameters)
+	pipeline.fit(trainData,trainCategory)
+	return pipeline
 
 def prediction(clf,testData,testCategory):
 	predict=clf.predict(testData)
 	#print f1_score(testCategory,predict)
-	print classification_report(testCategory,predict)
-	return clf
-
+	#print classification_report(testCategory,predict)
+	#print (precision_score(testCategory,predict,pos_label=0),recall_score(testCategory,predict,pos_label=0),precision_score(testCategory,predict,pos_label=1),recall_score(testCategory,predict,pos_label=1))
+	tmp=np.array([precision_score(testCategory,predict,pos_label=0),recall_score(testCategory,predict,pos_label=0),precision_score(testCategory,predict,pos_label=1),recall_score(testCategory,predict,pos_label=1)])
+	print tmp
+	return tmp
 
 num_cross_validation_folds=5
 val=20
+K_max = 90
+K_min = 5
+K_space = 5
+
+k_values = range(K_min, K_max, K_space)
+
+
 # Read in the data
 data, category = general_functions.read_in_data()
 
@@ -121,30 +154,53 @@ data=softImpute(np.array(data))
 category=np.array(category)
 
 cross_val_fold = KFold(n_splits=num_cross_validation_folds, shuffle=True)
-for training_indices, testing_indices in cross_val_fold.split(data):
-    nB=NaiveBayes(data[training_indices], category[training_indices])
-    print 'Naive Bayes'
-    prediction(nB,data[testing_indices],category[testing_indices])
-    gB=GradientBoosting(data[training_indices], category[training_indices])
-    print 'Gradient Boosting'
-    prediction(gB,data[testing_indices],category[testing_indices])
-    aB=AdaBoost(data[training_indices], category[training_indices])
-    print 'Ada Boosting'
-    prediction(aB,data[testing_indices],category[testing_indices])
-    randForest=RandomForest(data[training_indices], category[training_indices])
-    print 'Random Forest'
-    prediction(randForest,data[testing_indices],category[testing_indices])
-    exTree=ExtraTrees(data[training_indices], category[training_indices])
-    print 'Extra random Forest'
-    prediction(exTree,data[testing_indices],category[testing_indices])
-    svmRBF=SVM(data[training_indices], category[training_indices])
-    print 'SVM rbf kernel'
-    prediction(svmRBF,data[testing_indices],category[testing_indices])
-    print 'SVM poly kernel'
-    svmPOLY=SVM(data[training_indices], category[training_indices],kernel='poly')
-    prediction(svmPOLY,data[testing_indices],category[testing_indices])
+
+
+parameters = {'kernel':('linear', 'rbf'), 'C':[1, 10]}
+
+
+classsifiers=['RandomForest','ExtraTrees','NaiveBayes','GradientBoosting','AdaBoost']
+nClassifiers=len(classsifiers)
+classiferStatistics=np.zeros([nClassifiers,len(k_values),num_cross_validation_folds,4])
+#locals()["myfunction"]
+for i,val in enumerate(k_values):
+	for j,clf in enumerate(classsifiers):
+		counter=-1
+		tmpClf=locals()[clf](data[training_indices], category[training_indices],kBest=val,gridSearch=1)
+		for training_indices, testing_indices in cross_val_fold.split(data):
+			counter+=1
+			tmpClf=locals()[clf](data[training_indices], category[training_indices],kBest=val)
+			classiferStatistics[j,i,counter]+= prediction(tmpClf,data[testing_indices],category[testing_indices])
+		print clf,val,np.mean(classiferStatistics[j,i],axis=0)
+	    # nB=NaiveBayes(data[training_indices], category[training_indices],kBest=val)
+	    # prediction(nB,data[testing_indices],category[testing_indices])
+	    # print 'Naive Bayes'
+	    
+	    # gB=GradientBoosting(data[training_indices], category[training_indices])
+	    # print 'Gradient Boosting'
+	    # prediction(gB,data[testing_indices],category[testing_indices])
+	    # aB=AdaBoost(data[training_indices], category[training_indices])
+	    # print 'Ada Boosting'
+	    # prediction(aB,data[testing_indices],category[testing_indices])
+	    # randForest=RandomForest(data[training_indices], category[training_indices])
+	    # print 'Random Forest'
+	    # prediction(randForest,data[testing_indices],category[testing_indices])
+	    # exTree=ExtraTrees(data[training_indices], category[training_indices])
+	    # print 'Extra random Forest'
+	    # prediction(exTree,data[testing_indices],category[testing_indices])
+
+f=open('../data/classifiers.pkl','w')
+pickle.dump([classsifiers,classiferStatistics],f)
+f.close()
 
 # Need to look more carefully at these. The are also quite slow!     
+	    #svmRBF=SVM(data[training_indices], category[training_indices])
+	    # print 'SVM rbf kernel'
+	    # prediction(svmRBF,data[testing_indices],category[testing_indices])
+	    # print 'SVM poly kernel'
+	    # svmPOLY=SVM(data[training_indices], category[training_indices],kernel='poly')
+	    # prediction(svmPOLY,data[testing_indices],category[testing_indices])
+
     # logRl1=LogisticReg(data[training_indices], category[training_indices],penalty='l1')
     # prediction(logRl1,data[testing_indices],category[testing_indices])
     # logRl2=LogisticReg(data[training_indices], category[training_indices],penalty='l2')
