@@ -169,7 +169,7 @@ for i,val in enumerate(k_values):
 		tmpClf=locals()[clf](data[training_indices], category[training_indices],kBest=val,gridSearch=1)
 		for training_indices, testing_indices in cross_val_fold.split(data):
 			counter+=1
-			tmpClf=locals()[clf](data[training_indices], category[training_indices],kBest=val)
+			tmpClf.fit(data[training_indices], category[training_indices])
 			classiferStatistics[j,i,counter]+= prediction(tmpClf,data[testing_indices],category[testing_indices])
 		print clf,val,np.mean(classiferStatistics[j,i],axis=0)
 	    # nB=NaiveBayes(data[training_indices], category[training_indices],kBest=val)
