@@ -39,7 +39,7 @@ def LogisticReg(trainData,trainCategory,penalty='l1',feature_sel=1,score_func=mu
 		if feature_sel:
 				parameters={'classifier__penalty':['l1','l2']}
 				if k_Range is not None:
-					parameters['select_k']=k_Range
+					parameters['select__k']=k_Range
 				feature_sel = SelectKBest(score_func=score_func, k=kBest)
 				pipeline = Pipeline([('select', feature_sel),('classifier', classifier)])
 		else:
