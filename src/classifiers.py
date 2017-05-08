@@ -190,7 +190,7 @@ classifiers=['RandomForest','ExtraTrees','NaiveBayes','GradientBoosting','AdaBoo
 
 multiProcFuncs.parmap(runClassifier,classifier)
 
-def runClassifier(clf)
+def runClassifier(clf):
 	num_cross_validation_folds=25
 	val=20
 	K_max = 90
