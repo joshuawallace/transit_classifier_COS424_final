@@ -13,8 +13,9 @@ from sklearn.pipeline import Pipeline
 import general_functions
 from sklearn.metrics import precision_score,recall_score
 from sklearn.model_selection import GridSearchCV
-
 from sklearn.ensemble import RandomForestClassifier,ExtraTreesClassifier,GradientBoostingClassifier,AdaBoostClassifier
+import multiProcFuncs
+
 
 def softImpute(data,nCompSoft=30,**kargs):
         imputeFnc = soft_impute.SoftImpute(J=nCompSoft, lambda_=0.0)
@@ -183,8 +184,14 @@ def prediction(clf,testData,testCategory):
 	print tmp
 	return tmp
 
-if __name__=="__main__":
-	num_cross_validation_folds=5
+
+classifiers=['RandomForest','ExtraTrees','NaiveBayes','GradientBoosting','AdaBoost','LogisticReg','SVM'] # 
+#for j,clf in enumerate(classifiers):
+
+multiProcFuncs.parmap(runClassifier,classifier)
+
+def runClassifier(clf)
+	num_cross_validation_folds=25
 	val=20
 	K_max = 90
 	K_min = 5
@@ -209,40 +216,39 @@ if __name__=="__main__":
 
 
 
-	classifiers=['RandomForest','ExtraTrees','NaiveBayes','GradientBoosting','AdaBoost']
-	nClassifiers=len(classifiers)
+
 	
 	#locals()["myfunction"]
 
-	for j,clf in enumerate(classifiers):
-		counter=-1
-		tmpClf=locals()[clf](data, category,kBest=val,gridSearch=1,k_Range=k_values)
-		classiferStatistics=np.zeros([num_cross_validation_folds,4])
-		for training_indices, testing_indices in cross_val_fold.split(data):
-			counter+=1
-			tmpClf.fit(data[training_indices], category[training_indices])
-			classiferStatistics[counter]+= prediction(tmpClf,data[testing_indices],category[testing_indices])
-		print clf,val,np.mean(classiferStatistics[j,i],axis=0)
-		    # nB=NaiveBayes(data[training_indices], category[training_indices],kBest=val)
-		    # prediction(nB,data[testing_indices],category[testing_indices])
-		    # print 'Naive Bayes'
-		    
-		    # gB=GradientBoosting(data[training_indices], category[training_indices])
-		    # print 'Gradient Boosting'
-		    # prediction(gB,data[testing_indices],category[testing_indices])
-		    # aB=AdaBoost(data[training_indices], category[training_indices])
-		    # print 'Ada Boosting'
-		    # prediction(aB,data[testing_indices],category[testing_indices])
-		    # randForest=RandomForest(data[training_indices], category[training_indices])
-		    # print 'Random Forest'
-		    # prediction(randForest,data[testing_indices],category[testing_indices])
-		    # exTree=ExtraTrees(data[training_indices], category[training_indices])
-		    # print 'Extra random Forest'
-		    # prediction(exTree,data[testing_indices],category[testing_indices])
+	
+	counter=-1
+	tmpClf=locals()[clf](data, category,kBest=val,gridSearch=1,k_Range=k_values)
+	classiferStatistics=np.zeros([num_cross_validation_folds,4])
+	for training_indices, testing_indices in cross_val_fold.split(data):
+		counter+=1
+		tmpClf.fit(data[training_indices], category[training_indices])
+		classiferStatistics[counter]+= prediction(tmpClf,data[testing_indices],category[testing_indices])
+	print clf,val,np.mean(classiferStatistics[j],axis=0)
+	    # nB=NaiveBayes(data[training_indices], category[training_indices],kBest=val)
+	    # prediction(nB,data[testing_indices],category[testing_indices])
+	    # print 'Naive Bayes'
+	    
+	    # gB=GradientBoosting(data[training_indices], category[training_indices])
+	    # print 'Gradient Boosting'
+	    # prediction(gB,data[testing_indices],category[testing_indices])
+	    # aB=AdaBoost(data[training_indices], category[training_indices])
+	    # print 'Ada Boosting'
+	    # prediction(aB,data[testing_indices],category[testing_indices])
+	    # randForest=RandomForest(data[training_indices], category[training_indices])
+	    # print 'Random Forest'
+	    # prediction(randForest,data[testing_indices],category[testing_indices])
+	    # exTree=ExtraTrees(data[training_indices], category[training_indices])
+	    # print 'Extra random Forest'
+	    # prediction(exTree,data[testing_indices],category[testing_indices])
 
-		f=open('../data/classifiers'+clf+'.pkl','w')
-		pickle.dump([clf,tmpClf,classiferStatistics],f)
-		f.close()
+	f=open('../data/classifiers'+clf+'.pkl','w')
+	pickle.dump([clf,tmpClf,classiferStatistics],f)
+	f.close()
 
 	# Need to look more carefully at these. The are also quite slow!     
 		    #svmRBF=SVM(data[training_indices], category[training_indices])
