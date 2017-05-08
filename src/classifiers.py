@@ -186,6 +186,8 @@ def prediction(clf,testData,testCategory):
 
 
 def runClassifier(clf):
+	classifiers=['RandomForest','ExtraTrees','NaiveBayes','GradientBoosting','AdaBoost','LogisticReg','SVM'] # 
+	clf=classifiers[clf]
 	num_cross_validation_folds=25
 	val=20
 	K_max = 90
@@ -268,8 +270,8 @@ def runClassifier(clf):
 
 
 
-classifiers=['RandomForest','ExtraTrees','NaiveBayes','GradientBoosting','AdaBoost','LogisticReg','SVM'] # 
+
 #for j,clf in enumerate(classifiers):
 
-multiProcFuncs.parmap(runClassifier,classifier)
+multiProcFuncs.parmap(runClassifier,range(7))
 
