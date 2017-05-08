@@ -219,7 +219,7 @@ def runClassifier(clf):
 
 	
 	counter=-1
-	tmpClf=locals()[clf](data, category,kBest=val,gridSearch=1,k_Range=k_values)
+	tmpClf=globals()[clf](data, category,kBest=val,gridSearch=1,k_Range=k_values)
 	classiferStatistics=np.zeros([num_cross_validation_folds,4])
 	for training_indices, testing_indices in cross_val_fold.split(data):
 		counter+=1
