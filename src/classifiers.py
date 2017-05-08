@@ -3,7 +3,7 @@ import pickle
 from sklearn.naive_bayes import GaussianNB
 from  sklearn.linear_model import LogisticRegressionCV
 import soft_impute
-from ppca import PPCA
+#from ppca import PPCA
 from sklearn.metrics import f1_score, classification_report
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import mutual_info_classif
@@ -185,11 +185,6 @@ def prediction(clf,testData,testCategory):
 	return tmp
 
 
-classifiers=['RandomForest','ExtraTrees','NaiveBayes','GradientBoosting','AdaBoost','LogisticReg','SVM'] # 
-#for j,clf in enumerate(classifiers):
-
-multiProcFuncs.parmap(runClassifier,classifier)
-
 def runClassifier(clf):
 	num_cross_validation_folds=25
 	val=20
@@ -269,3 +264,12 @@ def runClassifier(clf):
 
 
 	#mutInf=sklearn.feature_selection.mutual_info_classif(data,category)
+
+
+
+
+classifiers=['RandomForest','ExtraTrees','NaiveBayes','GradientBoosting','AdaBoost','LogisticReg','SVM'] # 
+#for j,clf in enumerate(classifiers):
+
+multiProcFuncs.parmap(runClassifier,classifier)
+
