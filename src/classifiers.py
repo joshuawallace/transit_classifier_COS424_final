@@ -225,7 +225,7 @@ def runClassifier(clf):
 		counter+=1
 		tmpClf.fit(data[training_indices], category[training_indices])
 		classiferStatistics[counter]+= prediction(tmpClf,data[testing_indices],category[testing_indices])
-	print clf,val,np.mean(classiferStatistics[j],axis=0)
+	print clf,val,np.mean(classiferStatistics,axis=0)
 	    # nB=NaiveBayes(data[training_indices], category[training_indices],kBest=val)
 	    # prediction(nB,data[testing_indices],category[testing_indices])
 	    # print 'Naive Bayes'
