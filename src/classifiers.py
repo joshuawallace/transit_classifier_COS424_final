@@ -47,7 +47,7 @@ def LogisticReg(trainData,trainCategory,penalty='l1',feature_sel=1,score_func=mu
 		else:
 			pipeline=classifier
 		if gridSearch:
-			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs)
+			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,score='f1_score')
 		pipeline.fit(trainData,trainCategory)
 
 		if gridSearch:
@@ -55,27 +55,32 @@ def LogisticReg(trainData,trainCategory,penalty='l1',feature_sel=1,score_func=mu
 			return pipeline.estimator
 		return pipeline
 
-def NaiveBayes(trainData,trainCategory,feature_sel=1,score_func=mutual_info_classif,kBest=20,gridSearch=0,k_Range=None,n_jobs=1 ):
+def NaiveBayes(trainData,trainCategory,feature_sel=1,score_func=mutual_info_classif,kBest=20,gridSearch=0,k_Range=None,n_jobs=1,score='f1_score' ):
 	feature_sel = SelectKBest(score_func=score_func, k=kBest)
 	pipeline = Pipeline([('select', feature_sel),('classifier', GaussianNB())])
 	if gridSearch and k_Range is not None:
 		parameters={'select__k':k_Range}
-		pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs)
+		pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,score=score)
 	pipeline.fit(trainData,trainCategory)
 	if gridSearch and k_Range is not None:
 			pipeline.estimator.set_params(**pipeline.best_params_)
 			return pipeline.estimator
 	return pipeline
 
-def SVM(trainData,trainCategory,C=1.0, kernel='rbf' , degree=3, gamma='auto',feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0,k_Range=None,n_jobs=1 ): #kernel 'rbf','poly'
+def SVM(trainData,trainCategory,C=1.0, kernel='rbf' , degree=3, gamma='auto',feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0,k_Range=None,n_jobs=1 ,score='f1_score'): #kernel 'rbf','poly'
 	classifier=SVC(C=C,kernel='rbf',degree=degree,gamma=gamma)
 #parameters = {'kernel':('linear', 'rbf'), 'C':[1, 10]}param_grid={"C": [1e0, 1e1, 1e2, 1e3],
                            #    "gamma": np.logspace(-2, 2, 5)})
-	param_grid=[{'kernel': ['rbf'], 'gamma': np.logspace(-2, 2, 5),
-                     'C': [1, 10, 100, 1000]},{'kernel': ['poly'], 'C': [1, 10, 100, 1000],'degree':[1,3,5]}]
+	#param_grid=[{'kernel': ['rbf'], 'gamma': np.logspace(-2, 2, 5),
+    #                 'C': [1, 10, 100, 1000]},{'kernel': ['poly'], 'C': [1, 10, 100, 1000],'degree':[1,3,5]}]
+	param_grid=[{'kernel': ['rbf'],
+                     'C': [1, 10, 100, 1000]},{'kernel': ['poly'], 'C': [1, 10, 100, 1000]}]
+
 	if feature_sel:
-		param_grid=[{'classifier__kernel': ['rbf'], 'classifier__gamma': np.logspace(-2, 2, 5),
-                     'classifier__C': [1, 10, 100, 1000]},{'classifier__kernel': ['poly'], 'classifier__C': [1, 10, 100, 1000],'classifier__degree':[1,3,5]}]	
+		#param_grid=[{'classifier__kernel': ['rbf'], 'classifier__gamma': np.logspace(-2, 2, 5),
+        #             'classifier__C': [1, 10, 100, 1000]},{'classifier__kernel': ['poly'], 'classifier__C': [1, 10, 100, 1000],'classifier__degree':[1,3,5]}]	
+		param_grid=[{'classifier__kernel': ['rbf'],
+                     'classifier__C': [1, 10, 100, 1000]},{'classifier__kernel': ['poly'], 'classifier__C': [1, 10, 100, 1000]}]	
 
 		if k_Range is not None:
 			param_grid[0]['select__k']=k_Range
@@ -85,7 +90,7 @@ def SVM(trainData,trainCategory,C=1.0, kernel='rbf' , degree=3, gamma='auto',fea
 	else:
 		pipeline=classifier
 	if gridSearch:
-			pipeline = GridSearchCV(pipeline, param_grid=param_grid,n_jobs=n_jobs)
+			pipeline = GridSearchCV(pipeline, param_grid=param_grid,n_jobs=n_jobs,score=score)
 	pipeline.fit(trainData,trainCategory)
 	if gridSearch:
 			pipeline.estimator.set_params(**pipeline.best_params_)
@@ -93,7 +98,7 @@ def SVM(trainData,trainCategory,C=1.0, kernel='rbf' , degree=3, gamma='auto',fea
 	return pipeline
 
 
-def RandomForest(trainData,trainCategory, n_estimators=10,feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0,k_Range=None,n_jobs=1  ): 
+def RandomForest(trainData,trainCategory, n_estimators=10,feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0,k_Range=None,n_jobs=1,score='f1_score'  ): 
 	classifier=RandomForestClassifier(n_estimators=n_estimators)
 	parameters={'n_estimators':[5,30]}
 	if feature_sel:
@@ -105,7 +110,7 @@ def RandomForest(trainData,trainCategory, n_estimators=10,feature_sel=1,score_fu
 	else:
 		pipeline=classifier
 	if gridSearch:
-			pipeline = GridSearchCV(pipeline, parameters,n_jobs=1)
+			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,score=score)
 			
 	pipeline.fit(trainData,trainCategory)
 	if gridSearch:
@@ -114,7 +119,7 @@ def RandomForest(trainData,trainCategory, n_estimators=10,feature_sel=1,score_fu
 	return pipeline
 
 
-def ExtraTrees(trainData,trainCategory, n_estimators=10,feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0 ,k_Range=None,n_jobs=1 ): 
+def ExtraTrees(trainData,trainCategory, n_estimators=10,feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0 ,k_Range=None,n_jobs=1,score='f1_score' ): 
 	classifier=ExtraTreesClassifier(n_estimators=n_estimators)
 	parameters={'n_estimators':[5,30]}
 	if feature_sel:
@@ -126,7 +131,7 @@ def ExtraTrees(trainData,trainCategory, n_estimators=10,feature_sel=1,score_func
 	else:
 		pipeline=classifier
 	if gridSearch:
-			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs)
+			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,score=score)
 
 	pipeline.fit(trainData,trainCategory)
 	if gridSearch:
@@ -135,11 +140,13 @@ def ExtraTrees(trainData,trainCategory, n_estimators=10,feature_sel=1,score_func
 	return pipeline
 
 
-def AdaBoost(trainData,trainCategory, n_estimators=100,feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0,k_Range=None,n_jobs=1  ): 
+def AdaBoost(trainData,trainCategory, n_estimators=100,feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0,k_Range=None,n_jobs=1,score='f1_score'  ): 
 	classifier=AdaBoostClassifier(n_estimators=n_estimators)
-	parameters={'learning_rate' : [.01,.1,.5],'n_estimators' : [10,100,500]}
+	#parameters={'learning_rate' : [.01,.1,.5],'n_estimators' : [10,100,500]}
+	parameters={'n_estimators' : [10,100,500]}
 	if feature_sel:
-		parameters={'classifier__learning_rate' : [.01,.1,.5],'classifier__n_estimators' : [10,100,500]}
+		#parameters={'classifier__learning_rate' : [.01,.1,.5],'classifier__n_estimators' : [10,100,500]}
+		parameters={'classifier__n_estimators' : [10,100,500]}
 		if k_Range is not None:
 			parameters['select__k']=k_Range
 		feature_sel = SelectKBest(score_func=score_func, k=kBest)
@@ -148,7 +155,7 @@ def AdaBoost(trainData,trainCategory, n_estimators=100,feature_sel=1,score_func=
 	else:
 		pipeline=classifier
 	if gridSearch:
-			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs)
+			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,score=score)
 	pipeline.fit(trainData,trainCategory)
 	if gridSearch:
 			pipeline.estimator.set_params(**pipeline.best_params_)
@@ -156,7 +163,7 @@ def AdaBoost(trainData,trainCategory, n_estimators=100,feature_sel=1,score_func=
 	return pipeline
 
 
-def GradientBoosting(trainData,trainCategory, n_estimators=100,max_depth=3,feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0,k_Range=None,n_jobs=1): 
+def GradientBoosting(trainData,trainCategory, n_estimators=100,max_depth=3,feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0,k_Range=None,n_jobs=1,score='f1_score'): 
 	classifier=GradientBoostingClassifier(n_estimators=n_estimators,max_depth=3)
 	parameters={'learning_rate' : [.01,.1,.5],'n_estimators' : [10,100,500],'max_depth':[1,3,5]}
 	if feature_sel:
@@ -169,7 +176,7 @@ def GradientBoosting(trainData,trainCategory, n_estimators=100,max_depth=3,featu
 	else:
 		pipeline=classifier
 	if gridSearch:
-			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs)
+			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,score=score)
 
 	pipeline.fit(trainData,trainCategory)
 	if gridSearch:
@@ -188,15 +195,15 @@ def prediction(clf,testData,testCategory):
 
 
 def runClassifier(clf):
-	#classifiers=['RandomForest','ExtraTrees','NaiveBayes','GradientBoosting','AdaBoost','LogisticReg','SVM'] # 
-	classifiers=['AdaBoost','SVM'] 
+	classifiers=['RandomForest','ExtraTrees','NaiveBayes','GradientBoosting','AdaBoost','LogisticReg','SVM'] # 
+	#classifiers=['GradientBoosting','AdaBoost','SVM'] 
 	clf=classifiers[clf]
 	num_cross_validation_folds=25
 	val=20
 	K_max = 90
 	K_min = 5
 	K_space = 5
-
+	score='f1_score'
 	k_values = range(K_min, K_max, K_space)
 
 
@@ -222,7 +229,10 @@ def runClassifier(clf):
 
 	
 	counter=-1
-	tmpClf=globals()[clf](data, category,kBest=val,gridSearch=1,k_Range=k_values,n_jobs=int(os.environ['OMP_NUM_THREADS']))
+	try:
+		tmpClf=globals()[clf](data, category,kBest=val,gridSearch=1,k_Range=k_values,n_jobs=int(os.environ['OMP_NUM_THREADS']),score=score)
+	except KeyError:
+		tmpClf=globals()[clf](data, category,kBest=val,gridSearch=1,k_Range=k_values,n_jobs=2,score=score)
 	classiferStatistics=np.zeros([num_cross_validation_folds,4])
 	for training_indices, testing_indices in cross_val_fold.split(data):
 		counter+=1
@@ -246,7 +256,7 @@ def runClassifier(clf):
 	    # print 'Extra random Forest'
 	    # prediction(exTree,data[testing_indices],category[testing_indices])
 
-	f=open('../data/classifiers'+clf+'.pkl','w')
+	f=open('../data/classifiers_test'+clf+'.pkl','w')
 	pickle.dump([clf,tmpClf,classiferStatistics],f)
 	f.close()
 
@@ -270,7 +280,7 @@ def runClassifier(clf):
 
 	#mutInf=sklearn.feature_selection.mutual_info_classif(data,category)
 
-for i in range(2):
+for i in range(7):
 	runClassifier(i)
 
 
