@@ -47,7 +47,7 @@ def LogisticReg(trainData,trainCategory,penalty='l1',feature_sel=1,score_func=mu
 		else:
 			pipeline=classifier
 		if gridSearch:
-			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,score='f1_score')
+			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,scoring='f1_score')
 		pipeline.fit(trainData,trainCategory)
 
 		if gridSearch:
@@ -60,7 +60,7 @@ def NaiveBayes(trainData,trainCategory,feature_sel=1,score_func=mutual_info_clas
 	pipeline = Pipeline([('select', feature_sel),('classifier', GaussianNB())])
 	if gridSearch and k_Range is not None:
 		parameters={'select__k':k_Range}
-		pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,score=score)
+		pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,scoring=score)
 	pipeline.fit(trainData,trainCategory)
 	if gridSearch and k_Range is not None:
 			pipeline.estimator.set_params(**pipeline.best_params_)
@@ -90,7 +90,7 @@ def SVM(trainData,trainCategory,C=1.0, kernel='rbf' , degree=3, gamma='auto',fea
 	else:
 		pipeline=classifier
 	if gridSearch:
-			pipeline = GridSearchCV(pipeline, param_grid=param_grid,n_jobs=n_jobs,score=score)
+			pipeline = GridSearchCV(pipeline, param_grid=param_grid,n_jobs=n_jobs,scoring=score)
 	pipeline.fit(trainData,trainCategory)
 	if gridSearch:
 			pipeline.estimator.set_params(**pipeline.best_params_)
@@ -110,7 +110,7 @@ def RandomForest(trainData,trainCategory, n_estimators=10,feature_sel=1,score_fu
 	else:
 		pipeline=classifier
 	if gridSearch:
-			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,score=score)
+			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,scoring=score)
 			
 	pipeline.fit(trainData,trainCategory)
 	if gridSearch:
@@ -131,7 +131,7 @@ def ExtraTrees(trainData,trainCategory, n_estimators=10,feature_sel=1,score_func
 	else:
 		pipeline=classifier
 	if gridSearch:
-			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,score=score)
+			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,scoring=score)
 
 	pipeline.fit(trainData,trainCategory)
 	if gridSearch:
@@ -155,7 +155,7 @@ def AdaBoost(trainData,trainCategory, n_estimators=100,feature_sel=1,score_func=
 	else:
 		pipeline=classifier
 	if gridSearch:
-			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,score=score)
+			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,scoring=score)
 	pipeline.fit(trainData,trainCategory)
 	if gridSearch:
 			pipeline.estimator.set_params(**pipeline.best_params_)
@@ -176,7 +176,7 @@ def GradientBoosting(trainData,trainCategory, n_estimators=100,max_depth=3,featu
 	else:
 		pipeline=classifier
 	if gridSearch:
-			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,score=score)
+			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,scoring=score)
 
 	pipeline.fit(trainData,trainCategory)
 	if gridSearch:
@@ -203,7 +203,7 @@ def runClassifier(clf):
 	K_max = 90
 	K_min = 5
 	K_space = 5
-	score='f1_score'
+	score='f1'
 	k_values = range(K_min, K_max, K_space)
 
 
