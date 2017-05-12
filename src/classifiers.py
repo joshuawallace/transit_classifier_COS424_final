@@ -47,7 +47,7 @@ def LogisticReg(trainData,trainCategory,penalty='l1',feature_sel=1,score_func=mu
 		else:
 			pipeline=classifier
 		if gridSearch:
-			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs,scoring='f1_score')
+			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs)
 		pipeline.fit(trainData,trainCategory)
 
 		if gridSearch:
@@ -195,8 +195,8 @@ def prediction(clf,testData,testCategory):
 
 
 def runClassifier(clf):
-	classifiers=['RandomForest','ExtraTrees','NaiveBayes','GradientBoosting','AdaBoost','LogisticReg','SVM'] # 
-	#classifiers=['GradientBoosting','AdaBoost','SVM'] 
+	#classifiers=['RandomForest','ExtraTrees','NaiveBayes','GradientBoosting','AdaBoost','LogisticReg','SVM'] # 
+	classifiers=['LogisticReg','SVM'] 
 	clf=classifiers[clf]
 	num_cross_validation_folds=25
 	val=20
