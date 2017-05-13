@@ -5,7 +5,7 @@ We used some unsupervised learning to see if any structure that arises in the mo
 
 
 \subsection{Supervised Learning}
-
+We used several supervised classifiers to attempt to predict the class label for our data set. We consider the following classfiers from \texttt{scikit learn}\cite{scikit-learn}: logistic regression (with l1 and l2 penalties), naive bayes, SVM (with polynomail and RBF kernels) and four variations on decision trees; random forest, extra-trees, gradient boosted trees and adaboost trees. We used mutual inforamation to select the best n-features, where n was choosen by cross-validation. For all the methods with hyperparameters, we fit them using cross validation. Finally we combined all of these classifiers together and used them in a combined manner. For the combined classifier we used two methods, first where the classifiers 'voted' on the label with the label set by the majority vote. In the second method we weighted the predicted labels by the classifier's prediction probability.
 
 
 

@@ -15,3 +15,7 @@ For PCA, the first principal component explains 20\% of the variance, then 11\%,
 
 
 \subsection{Supervised Learning}
+
+We used four metrics to assess our estimators these were the precision (True Positives / (True Positives + False Positives)) and the recall  (True Positives / (True Positives + False Negatives)) of both of the two classes. It should be noted that our data set is very imbalanced, with many more rejected cases ($29420$) than accepted cases ($1024$). The result of this was that for almost all of estimators we achieved high precision and recall for the rejected objects, thus the more interesting metrics are the precision and recall of the accepted obejcts.
+
+In table \ref{table:classifiers} we present the average precision and recall of our classifiers on the with-held data set averaged from $25$ fold cross-validation.

@@ -13,7 +13,7 @@ from sklearn.pipeline import Pipeline
 import general_functions
 from sklearn.metrics import precision_score,recall_score
 from sklearn.model_selection import GridSearchCV
-from sklearn.ensemble import RandomForestClassifier,ExtraTreesClassifier,GradientBoostingClassifier,AdaBoostClassifier
+from sklearn.ensemble import RandomForestClassifier,ExtraTreesClassifier,GradientBoostingClassifier,AdaBoostClassifier,VotingClassifier
 import os
 
 #import multiProcFuncs
@@ -34,7 +34,7 @@ def PPCA(data,nCompPCA=30,**kargs):
         #print tmp.astype('float').shape
         return data
 
-def LogisticReg(trainData,trainCategory,penalty='l1',feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0,k_Range=None,n_jobs=1):
+def LogisticReg(trainData,trainCategory,penalty='l1',feature_sel=1,score_func=mutual_info_classif, kBest=20,gridSearch=0,k_Range=None,n_jobs=1,score=0):
 
 		classifier=LogisticRegressionCV(penalty=penalty,solver='liblinear')
 		parameters={'penalty':['l1','l2']}
@@ -203,6 +203,7 @@ def runClassifier(clf):
 	K_max = 90
 	K_min = 5
 	K_space = 5
+	imputeComps=30
 	score='f1'
 	k_values = range(K_min, K_max, K_space)
 
@@ -216,7 +217,7 @@ def runClassifier(clf):
 	        if np.isinf(data[i][j]):
 	            data[i][j] = float('nan')
 
-	data=softImpute(np.array(data))
+	data=softImpute(np.array(data),nCompSoft=imputeComps)
 	category=np.array(category)
 
 	cross_val_fold = KFold(n_splits=num_cross_validation_folds, shuffle=True)
@@ -256,7 +257,7 @@ def runClassifier(clf):
 	    # print 'Extra random Forest'
 	    # prediction(exTree,data[testing_indices],category[testing_indices])
 
-	f=open('../data/classifiers_test'+clf+'.pkl','w')
+	f=open('../data/classifiers_test'+clf+'_'+str(imputeComps)+'.pkl','w')
 	pickle.dump([clf,tmpClf,classiferStatistics],f)
 	f.close()
 
@@ -278,10 +279,43 @@ def runClassifier(clf):
 	    # prediction(logRl2_featSel,data[testing_indices],category[testing_indices])
 
 
-	#mutInf=sklearn.feature_selection.mutual_info_classif(data,category)
 
-for i in range(7):
-	runClassifier(i)
+def runCombinedClassifier(classifiers,type='hard'):
+	num_cross_validation_folds=25
+	imputeComps=30
+
+	data, category = general_functions.read_in_data()
+
+	# Convert inf to nan for imputation
+	for i in range(len(data)):
+	    for j in range(len(data[i])):
+	        if np.isinf(data[i][j]):
+	            data[i][j] = float('nan')
+
+	data=softImpute(np.array(data),nCompSoft=imputeComps)
+	category=np.array(category)
+
+	cross_val_fold = KFold(n_splits=num_cross_validation_folds, shuffle=True)
+
+	estimators=[]
+	for clf in classifiers:
+	    f=open('../data/classifiers_test'+clf+'.pkl','r')
+	    [clf,tmpClf,classiferStatistics]=pickle.load(f);f.close()
+	    print clf,np.mean(classiferStatistics,axis=0)
+	    estimators.append((clf,tmpClf))
+	VotingClassifier(estimators, voting=type)
+	classiferStatistics=np.zeros([num_cross_validation_folds,4])
+	counter=0
+	for training_indices, testing_indices in cross_val_fold.split(data):
+		tmpClf.fit(data[training_indices], category[training_indices])
+		classiferStatistics[counter]+= prediction(tmpClf,data[testing_indices],category[testing_indices])
+		counter+=1
+
+	print type,val,np.mean(classiferStatistics,axis=0)
+	#mutInf=sklearn.feature_selection.mutual_info_classif(data,category)
+if __name__=='__main__':
+	for i in range(7):
+		runClassifier(i)
 
 
 #for j,clf in enumerate(classifiers):
