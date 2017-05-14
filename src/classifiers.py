@@ -46,11 +46,11 @@ def LogisticReg(trainData,trainCategory,penalty='l1',feature_sel=1,score_func=mu
 				pipeline = Pipeline([('select', feature_sel),('classifier', classifier)])
 		else:
 			pipeline=classifier
-		if gridSearch:
+		if gridSearch  and 0:
 			pipeline = GridSearchCV(pipeline, parameters,n_jobs=n_jobs)
 		pipeline.fit(trainData,trainCategory)
 
-		if gridSearch:
+		if gridSearch and 0:
 			pipeline.estimator.set_params(**pipeline.best_params_)
 			return pipeline.estimator
 		return pipeline
@@ -76,13 +76,13 @@ def SVM(trainData,trainCategory,C=1.0, kernel='rbf' , degree=3, gamma='auto',fea
 	param_grid=[{'kernel': ['rbf'],
                      'C': [1, 10, 100, 1000]},{'kernel': ['poly'], 'C': [1, 10, 100, 1000]}]
 
-	if feature_sel:
+	if feature_sel  and 0:
 		#param_grid=[{'classifier__kernel': ['rbf'], 'classifier__gamma': np.logspace(-2, 2, 5),
         #             'classifier__C': [1, 10, 100, 1000]},{'classifier__kernel': ['poly'], 'classifier__C': [1, 10, 100, 1000],'classifier__degree':[1,3,5]}]	
 		param_grid=[{'classifier__kernel': ['rbf'],
                      'classifier__C': [1, 10, 100, 1000]},{'classifier__kernel': ['poly'], 'classifier__C': [1, 10, 100, 1000]}]	
 
-		if k_Range is not None:
+		if k_Range is not None :
 			param_grid[0]['select__k']=k_Range
 			param_grid[1]['select__k']=k_Range
 		feature_sel = SelectKBest(score_func=score_func, k=kBest)
