@@ -1,14 +1,32 @@
 \subsection{Unsupervised Learning}
-We used some unsupervised learning to see if any structure that arises in the models aligns well with the classification.  We use the K-means, principal component analysis (PCA), Gaussian mixture model (GMM), and latent Dirichlet allocation (LDA) algorithms from \texttt{scikit learn}\cite{scikit-learn}.  Data are scaled prior to the PCA analysis, and features are re-centered to avoid negative values for the LDA algorithm.  Clusters and cluster membership are examined to see if any clusters have predominately and most of the positive examples. We also use the PCA-transformed data in supervised learning models.
+We used some unsupervised learning techniques to see if there were any obviously exploitable structures in the data that aligned well with the classifications.  We use the K-means, principal component analysis (PCA), Gaussian mixture model (GMM), and latent Dirichlet allocation (LDA) algorithms from \texttt{scikit learn}\cite{scikit-learn}.  Data are scaled prior to the PCA analysis, and features are re-centered to avoid negative values for the LDA algorithm.  Clusters and cluster membership are examined to see if any clusters have predominately and most of the positive examples. We also use the PCA-transformed data in supervised learning models.
 
 
 
 
 \subsection{Supervised Learning}
-We used several supervised classifiers to attempt to predict the class label for our data set. We consider the following classfiers from \texttt{scikit learn}\cite{scikit-learn}: logistic regression (with l1 and l2 penalties), naive bayes, SVM (with polynomail and RBF kernels) and four variations on decision trees; random forest, extra-trees, gradient boosted trees and adaboost trees. We used mutual inforamation to select the best n-features, where n was choosen by cross-validation. For all the methods with hyperparameters, we fit them using cross validation. Finally we combined all of these classifiers together and used them in a combined manner. For the combined classifier we used two methods, first where the classifiers 'voted' on the label with the label set by the majority vote. In the second method we weighted the predicted labels by the classifier's prediction probability.
+We used several supervised classifiers to attempt to predict the class label for our data set. We consider the following classfiers from \texttt{scikit learn}\cite{scikit-learn}: logistic regression (with L$_1$ and L$_2$ penalties), naive Bayes, SVM (with polynomail and RBF kernels) and four variations on decision trees; random forest, extra-trees, gradient boosted trees and adaboost trees. We used mutual inforamation to select the best n-features, where n was choosen by 25-fold cross-validation. For all the methods with hyperparameters, we fit them using 25-fold cross-validation. Finally we combined all of these classifiers together and used them in a combined manner. For the combined classifier we used two methods, first where the classifiers 'voted' on the label with the label set by the majority vote. In the second method we weighted the predicted labels by the classifier's prediction probability.
 
 
 
 
 
-\subsection{Focus on One Algorithm: }
+\subsection{Focus on One Algorithm: Logistic Regression}
+
+This section benefitted from \cite{lrwiki}.  The logistic function is defined as
+\begin{equation}
+f(\sigma) = \frac{e^\sigma}{e^\sigma+1} = \frac{1}{e^{-\sigma}+1}.
+\end{equation}
+In many cases, including logistic regression, it is useful to set $\sigma$ equal to a polynomial to allow for more flexible fitting to data.  As an example, we use first-degree polynomial $\sigma = kx - b$.  The parameter $k$ controls the ``steepness'' of the logistic fit and $b$ is used as a translation parameter, with $x$ now becoming the independent variable,
+\begin{equation}
+f(x) = \frac{1}{e^{-(kx-b)} + 1}.
+\end{equation}
+One can think of the logistic function as modeling exponential growth with a cap.  An example of such a situation is population growth in a location with a maximum ``carrying capacity'' (i.e., the environment can only support a maximum number of individuals).  Indeed, the logistic function is used as a tool modeling real-world population growth \cite{populationgrowth}.
+
+In statistical modeling, logistic regression is usually used to model a binary classification/outcome on a continuous domain.  Logistic regression can be extended to more than two classifications/outcomes in the form of multinomial logistic regression.  Since the problem addressed in this work is a binary classification problem, we focus on ``normal'' logistic regression.
+
+After a logistic function has been fit to given data, either a soft or a hard classification can be made of any subsequent data.  For a soft classification, a Bernoulli distribution can be used to assign probabilities of the two classifications using the value obtained from the logistic function.  More specifically, if $f(x)$ is the value of the logistic fit,
+\begin{equation}
+P(Y=y | x) = f(x)^y(1-f(x))^{1-y},
+\end{equation}
+where $y$ is the classification (either 0 or 1 in the binary case), $x$ is the data, and $Y$ is the assigned classification.  The nature of the logistic function is that as $x$ ventures far away from the value of $x=b$ (the translation parameter/median of the distribution), the probability will converge on a single classification being dominant, while at $b$ there is a 50/50 probability of both classifications.  For hard classification, a cutoff value for probability is chosen to assign a single classification to the data.  For example, if a greater than 0.2 probability that $Y=1$ is chosen as the cutoff value, then all data points with $P(Y=1|x) > 0.2$ will be assigned $Y=1$, and all other data points will be assigned $Y=0$.  In practice, the cutoff value is a hyperparameter that can (and should!) be tuned to give the best classification results.
