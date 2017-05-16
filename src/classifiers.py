@@ -311,7 +311,7 @@ def runCombinedClassifier(classifiers,type='hard'):
 		classiferStatistics[counter]+= prediction(tmpClf,data[testing_indices],category[testing_indices])
 		counter+=1
 
-	print type,val,np.mean(classiferStatistics,axis=0)
+	print type,np.mean(classiferStatistics,axis=0)
 	#mutInf=sklearn.feature_selection.mutual_info_classif(data,category)
 if __name__=='__main__':
 	for i in range(7):
